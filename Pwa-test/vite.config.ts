@@ -15,7 +15,7 @@ export default defineConfig({
     react(),
     babel({ presets: [reactCompilerPreset()] }),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: [
         'icons/icon-192.png',
         'icons/icon-512.png',
@@ -36,6 +36,7 @@ export default defineConfig({
         start_url: '/',
         scope: '/',
         id: '/',
+        prefer_related_applications: false,
         categories: ['photo', 'lifestyle', 'utilities'],
         icons: [
           {

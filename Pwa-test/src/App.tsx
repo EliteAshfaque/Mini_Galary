@@ -1,9 +1,11 @@
 import { useState } from 'react'
-import { InstallBanner } from './components/InstallBanner'
+import { IosInstallSheet } from './components/IosInstallSheet'
 import { Navbar } from './components/Navbar'
 import { OfflineBanner } from './components/OfflineBanner'
+import { UpdateBanner } from './components/UpdateBanner'
 import { useInstallPrompt } from './hooks/useInstallPrompt'
 import { useOnline } from './hooks/useOnline'
+import { usePwaUpdate } from './hooks/usePwaUpdate'
 import { Feed } from './pages/Feed'
 import { Gallery } from './pages/Gallery'
 import { People } from './pages/People'
@@ -21,6 +23,7 @@ export default function App() {
   const [photo, setPhoto] = useState<Photo | null>(null)
   const online = useOnline()
   const install = useInstallPrompt()
+  const update = usePwaUpdate()
 
   function openView(next: View) {
     setPhoto(null)
@@ -33,23 +36,10 @@ export default function App() {
 
   return (
     <div className="app">
-      <Navbar
-        view={view}
-        onView={openView}
-        online={online}
-        canInstall={install.canInstall}
-        installed={install.installed}
-        onInstall={() => void install.install()}
-      />
+      <Navbar view={view} onView={openView} online={online} />
       {!online ? <OfflineBanner /> : null}
-      {install.canInstall && !install.installed ? (
-        <InstallBanner
-          ios={install.ios}
-          showIosHelp={install.showIosHelp}
-          onInstall={() => void install.install()}
-          onDismissHelp={install.hideIosHelp}
-        />
-      ) : null}
+      <UpdateBanner open={update.available} onReload={update.reload} />
+      <IosInstallSheet open={install.showIosHelp} onClose={install.hideIosHelp} />
 
       <main className="content">
         {photo ? (

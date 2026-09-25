@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { BeforeInstallPromptEvent } from '../types'
+
+const IOS_HINT_KEY = 'lens-ios-install-hint'
 
 function isIos(): boolean {
   const ua = navigator.userAgent
@@ -13,55 +14,26 @@ function isStandalone(): boolean {
     window.matchMedia('(display-mode: standalone)').matches ||
     window.matchMedia('(display-mode: fullscreen)').matches ||
     window.matchMedia('(display-mode: minimal-ui)').matches ||
-    ('standalone' in navigator && Boolean((navigator as Navigator & { standalone?: boolean }).standalone))
+    ('standalone' in navigator &&
+      Boolean((navigator as Navigator & { standalone?: boolean }).standalone))
   )
 }
 
 export function useInstallPrompt() {
-  const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null)
-  const [installed, setInstalled] = useState(isStandalone)
-  const [ios, setIos] = useState(false)
   const [showIosHelp, setShowIosHelp] = useState(false)
 
   useEffect(() => {
-    setIos(isIos())
-    setInstalled(isStandalone())
-
-    const onPrompt = (event: Event) => {
-      event.preventDefault()
-      setDeferred(event as BeforeInstallPromptEvent)
+    if (!isIos() || isStandalone() || localStorage.getItem(IOS_HINT_KEY) === '1') {
+      return undefined
     }
-    const onInstalled = () => {
-      setInstalled(true)
-      setDeferred(null)
-      setShowIosHelp(false)
-    }
-
-    window.addEventListener('beforeinstallprompt', onPrompt)
-    window.addEventListener('appinstalled', onInstalled)
-    return () => {
-      window.removeEventListener('beforeinstallprompt', onPrompt)
-      window.removeEventListener('appinstalled', onInstalled)
-    }
+    const timer = window.setTimeout(() => setShowIosHelp(true), 1600)
+    return () => window.clearTimeout(timer)
   }, [])
 
-  const install = useCallback(async () => {
-    if (deferred) {
-      await deferred.prompt()
-      const choice = await deferred.userChoice
-      if (choice.outcome === 'accepted') setInstalled(true)
-      setDeferred(null)
-      return
-    }
-    if (ios && !installed) setShowIosHelp(true)
-  }, [deferred, ios, installed])
+  const hideIosHelp = useCallback(() => {
+    setShowIosHelp(false)
+    localStorage.setItem(IOS_HINT_KEY, '1')
+  }, [])
 
-  return {
-    canInstall: Boolean(deferred) || (ios && !installed),
-    installed,
-    ios,
-    showIosHelp,
-    hideIosHelp: () => setShowIosHelp(false),
-    install,
-  }
+  return { showIosHelp, hideIosHelp }
 }

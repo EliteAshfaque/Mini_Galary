@@ -10,19 +10,9 @@ type NavbarProps = {
   view: View
   onView: (view: View) => void
   online: boolean
-  canInstall: boolean
-  installed: boolean
-  onInstall: () => void
 }
 
-export function Navbar({
-  view,
-  onView,
-  online,
-  canInstall,
-  installed,
-  onInstall,
-}: NavbarProps) {
+export function Navbar({ view, onView, online }: NavbarProps) {
   return (
     <>
       <header className="topbar">
@@ -51,13 +41,6 @@ export function Navbar({
           <span className={online ? 'status on' : 'status off'}>
             {online ? 'Live' : 'Offline'}
           </span>
-          {installed ? (
-            <span className="installed-pill">Installed</span>
-          ) : canInstall ? (
-            <button type="button" className="install-btn" onClick={onInstall}>
-              Install
-            </button>
-          ) : null}
         </div>
       </header>
 

@@ -221,24 +221,39 @@ img {
   color: var(--danger);
 }
 
-.banner.help,
-.banner.install-hint {
-  background: var(--surface-2);
-  color: var(--text);
-  border: 1px solid var(--line);
-  text-align: left;
-}
-
-.banner.install-hint {
-  width: calc(100% - 24px);
-  cursor: pointer;
-}
-
-.banner.help {
+.sheet {
+  position: fixed;
+  z-index: 30;
+  left: 12px;
+  right: 12px;
+  bottom: calc(72px + var(--safe-bottom));
   display: flex;
-  gap: 10px;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.sheet p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.sheet.update {
+  background: #14261e;
+}
+
+@media (min-width: 720px) {
+  .sheet {
+    left: auto;
+    right: 16px;
+    bottom: 16px;
+    width: min(380px, calc(100% - 32px));
+  }
 }
 
 .banner p {
